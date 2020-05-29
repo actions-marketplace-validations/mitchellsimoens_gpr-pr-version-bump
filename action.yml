@@ -1,0 +1,12 @@
+name: Pull Request Node Version Bumper
+author: Mitchell Simoens
+description: Automatically bump a temporary alpha version of a node module within a pull request
+branding:
+  color: red
+  icon: activity
+outputs:
+  new_version:
+    description: The new version that was pushed.
+runs:
+  using: docker
+  image: Dockerfile
