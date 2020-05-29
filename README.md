@@ -50,3 +50,8 @@ jobs:
           release_name: Release ${{ steps.version.outputs.new_version }}
           prerelease: true
 ```
+
+## Cleanup
+
+When a pull request is closed, this action will not cleanup the versions. For this, see the
+[mitchellsimoens/gpr-pr-version-cleanup](https://github.com/mitchellsimoens/gpr-pr-version-cleanup) action.
