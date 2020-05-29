@@ -37,7 +37,7 @@ jobs:
       - uses: actions/checkout@master
       - id: version
         name: Version Bump
-        uses: mitchellsimoens/gpr-pr-version-bump
+        uses: mitchellsimoens/gpr-pr-version-bump@v1
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Create Release
