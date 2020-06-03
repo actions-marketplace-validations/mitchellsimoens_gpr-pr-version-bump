@@ -21,12 +21,24 @@ function parseSemver() {
   eval "$4"="$(echo "$1" | sed -E "s/$RE/\3/")"
 }
 
+function yesOrNo() {
+  local input=${1:-}
+
+  [ -z "$input" ] && echo "Yes" || echo "No"
+}
+
 if [[ "$GITHUB_REF" =~ refs/pull/([0-9]+)/merge ]]
 then
   SHA=$(cat "$GITHUB_EVENT_PATH" | jq .pull_request.head.sha)
   # 1:7 so we get 7 characters but ignore the starting double quote
   SHORT_SHA=${SHA:1:7}
   PR_NUM="${BASH_REMATCH[1]}"
+
+  SKIP_GIT_TAG=${INPUT_SKIP_GIT_TAG:-}
+
+  echo "Create git tag: $(yesOrNo "$SKIP_GIT_TAG")"
+
+  echo
 
   MAJOR=0
   MINOR=0
@@ -38,10 +50,12 @@ then
 
   NEW_VERSION="$MAJOR.$MINOR.$((PATCH + 1))-alpha.$PR_NUM-$SHORT_SHA"
 
+  # currently a simplistic way, if more are needed may create something better
+  CLI_FLAGS="$([ -z "$SKIP_GIT_TAG" ] && echo " " || echo " --no-git-tag-version")"
+
   echo "Bumping version to: $NEW_VERSION"
 
-  # do not create a tag, creating a release will create a tag
-  npm --no-git-tag-version version "$NEW_VERSION"
+  eval "npm$CLI_FLAGS version $NEW_VERSION"
 
   echo "::set-output name=new_version::$NEW_VERSION"
 else

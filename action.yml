@@ -3,7 +3,11 @@ author: Mitchell Simoens
 description: Automatically bump a temporary alpha version of a node module within a pull request
 branding:
   color: red
-  icon: activity
+  icon: git-pull-request
+inputs:
+  skip_git_tag:
+    description: Set to not create a git tag when npm version command is run.
+    required: false
 outputs:
   new_version:
     description: The new version that was pushed.

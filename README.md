@@ -55,3 +55,46 @@ jobs:
 
 When a pull request is closed, this action will not cleanup the versions. For this, see the
 [mitchellsimoens/gpr-pr-version-cleanup](https://github.com/mitchellsimoens/gpr-pr-version-cleanup) action.
+
+## Inputs
+
+The follow are the inputs this action accepts:
+
+| Name           | Required | Description                   |
+|----------------|----------|-------------------------------|
+| `skip_git_tag` | No       | Set to skip creating git tags |
+
+### `skip_git_tag`
+
+Set to `true` to not create a git tag when `npm version` command is executed. This action does not do any git pushing.
+
+```yaml
+name: PR Version
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+
+jobs:
+  test:
+    name: Bump Version
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+      - id: version
+        name: Version Bump
+        uses: mitchellsimoens/gpr-pr-version-bump@v1
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          skip_git_tag: true
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ steps.version.outputs.new_version }}
+          release_name: Release ${{ steps.version.outputs.new_version }}
+          prerelease: true
+```
