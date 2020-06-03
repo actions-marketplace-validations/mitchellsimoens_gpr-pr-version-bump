@@ -10,6 +10,18 @@ ${DEBUG:-false} && set -vx
 # and http://wiki.bash-hackers.org/scripting/debuggingtips
 export PS4='+(${BASH_SOURCE}:${LINENO}): ${FUNCNAME[0]:+${FUNCNAME[0]}(): }'
 
+BASE_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
+absolute_path() {
+    cd "$(dirname "$1")"
+
+    case $(basename "$1") in
+        ..) echo dirname pwd;;
+        .)  echo pwd;;
+        *)  echo "$(pwd)/$(basename "$1")";;
+    esac
+}
+
 function parseSemver() {
   local RE='^"([0-9]+).([0-9]+).([0-9]+)-?(.*)"$'
 
@@ -34,11 +46,16 @@ then
   SHORT_SHA=${SHA:1:7}
   PR_NUM="${BASH_REMATCH[1]}"
 
+  CWD=${INPUT_CWD:-"./"}
+  DIR=$(absolute_path "$BASE_DIR/$CWD")
   SKIP_GIT_TAG=${INPUT_SKIP_GIT_TAG:-}
 
   echo "Create git tag: $(yesOrNo "$SKIP_GIT_TAG")"
+  echo "Directory path: $DIR"
 
   echo
+
+  cd "$DIR"
 
   MAJOR=0
   MINOR=0

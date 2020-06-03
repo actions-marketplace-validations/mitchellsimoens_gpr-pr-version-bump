@@ -5,6 +5,10 @@ branding:
   color: red
   icon: git-pull-request
 inputs:
+  cwd:
+    default: ./
+    description: Set to the relative path where the package.json is located in.
+    required: false
   skip_git_tag:
     description: Set to not create a git tag when npm version command is run.
     required: false

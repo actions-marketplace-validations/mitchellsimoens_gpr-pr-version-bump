@@ -60,9 +60,47 @@ When a pull request is closed, this action will not cleanup the versions. For th
 
 The follow are the inputs this action accepts:
 
-| Name           | Required | Description                   |
-|----------------|----------|-------------------------------|
-| `skip_git_tag` | No       | Set to skip creating git tags |
+| Name           | Required | Description                                                    |
+|----------------|----------|----------------------------------------------------------------|
+| `cwd`          | No       | Set to the relative path where the package.json is located in. |
+| `skip_git_tag` | No       | Set to skip creating git tags                                  |
+
+### `cwd`
+
+Defaults to `./`, if the `package.json` is in a nested directory, set this input to the relative path where it's
+located in. This will `cd` into that directory so that the `package.json` is read from and where the `npm version`
+command will be executed in.
+
+```yaml
+name: PR Version
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+
+jobs:
+  test:
+    name: Bump Version
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+      - id: version
+        name: Version Bump
+        uses: mitchellsimoens/gpr-pr-version-bump@v1
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          cwd: ./nested/dir
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ steps.version.outputs.new_version }}
+          release_name: Release ${{ steps.version.outputs.new_version }}
+          prerelease: true
+```
 
 ### `skip_git_tag`
 
